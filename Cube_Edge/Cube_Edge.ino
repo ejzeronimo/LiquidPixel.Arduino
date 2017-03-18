@@ -1,11 +1,11 @@
 #include <Adafruit_NeoPixel.h>
 #include <avr/wdt.h>
 
-#define PIN 6;
-#define PIXEL_LEN 58;
+#define PIN 6
+#define PIXEL_LEN 62
 
 int pixelLen = PIXEL_LEN;
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(pixelLen, 6, NEO_RGB + NEO_KHZ800);
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(PIXEL_LEN, PIN, NEO_RGB + NEO_KHZ800);
 int brightness = 0;
 
 // sweep variables
@@ -20,18 +20,18 @@ bool isWalkingDone = false;
 
 //*****************************************************************************
 //T0C1R255G0B255D50X0W1M0~T0C3R177G201B99M1D100X1~T0C1R77G20B9M1D25X0~
-enum SegmentKey : byte
+enum SegmentKey : char
 {
-  Tk = (byte)'T',
-  Ck = (byte)'C',
-  Rk = (byte)'R',
-  Gk = (byte)'G',
-  Bk = (byte)'B',
-  Mk = (byte)'M',
-  Dk = (byte)'D',
-  Wk = (byte)'W',
-  Xk = (byte)'X',
-  EocK = (byte)'~',
+  Tk = 'T',
+  Ck = 'C',
+  Rk = 'R',
+  Gk = 'G',
+  Bk = 'B',
+  Mk = 'M',
+  Dk = 'D',
+  Wk = 'W',
+  Xk = 'X',
+  EocK = '~',
   UnknownK = 0
 };
 
@@ -63,48 +63,125 @@ enum Mode : byte
   RandomFadeIO
 };
 
-struct LiquidPixelCommand
-{
-  byte Type;
-  byte BoxId;
-  byte R;
-  byte G;
-  byte B;
-  byte Mode;
-  int DelayMs;
-  bool DoWipe;
-  bool IsRandom;
+class LiquidPixelCommand {
+  public:
+    LiquidPixelCommand() {
+      _type = 0;
+      _boxId = 0;
+      _r = 0;
+      _g = 0;
+      _b = 0;
+      _mode = 0;
+      _delayMs = 0;
+      _doWipe = false;
+      _isRandom = false;
+    }
+    void setType(byte value) {
+      _type = value;
+    }
+    byte Type() {
+      return _type;
+    }
+    void setBoxId(byte value) {
+      _boxId = value;
+    }
+    byte BoxId() {
+      return _boxId;
+    }
+    void setR(byte value) {
+      _r = value;
+    }
+    byte R() {
+      return _r;
+    }
+    void setG(byte value) {
+      _g = value;
+    }
+    byte G() {
+      return _g;
+    }
+    void setB(byte value) {
+      _b = value;
+    }
+    byte B() {
+      return _b;
+    }
+    void setMode(byte value) {
+      _mode = value;
+    }
+    byte Mode() {
+      return _mode;
+    }
+    void setDelayMs(byte value) {
+      _delayMs = value;
+    }
+    byte DelayMs() {
+      return _delayMs;
+    }
+    void setDoWipe(bool value) {
+      _doWipe = value;
+    }
+    byte DoWipe() {
+      return _doWipe;
+    }
+    void setIsRandom(bool value) {
+      _isRandom = value;
+    }
+    byte IsRandom() {
+      return _isRandom;
+    }
+    void Clear() {
+      _type = 0;
+      _boxId = 0;
+      _r = 0;
+      _g = 0;
+      _b = 0;
+      _mode = 0;
+      _delayMs = 0;
+      _doWipe = false;
+      _isRandom = false;
+    }
+  private:
+    byte _type;
+    byte _boxId;
+    byte _r;
+    byte _g;
+    byte _b;
+    byte _mode;
+    int _delayMs;
+    bool _doWipe;
+    bool _isRandom;
 };
 
 const byte MAX_SEGMENT_LENGTH_IN_BYTES = 3;
-byte segmentKey = (byte)UnknownK;
-byte segmentBytesTemp[MAX_SEGMENT_LENGTH_IN_BYTES] = {0, 0, 0};
+char segmentKey = UnknownK;
+char segmentBytes[MAX_SEGMENT_LENGTH_IN_BYTES] = {0, 0, 0};
 byte numberOfBytesInSegment = 0;
 LiquidPixelCommand lpc;
 
-void ProcessByte(byte commandByte)
+void ProcessByte(char commandByte)
 {
   switch (commandByte)
   {
-    case (byte)Tk:
-    case (byte)Ck:
-    case (byte)Rk:
-    case (byte)Gk:
-    case (byte)Bk:
-    case (byte)Mk:
-    case (byte)Dk:
-    case (byte)Wk:
-    case (byte)Xk:
+    case Tk:
+    case Ck:
+    case Rk:
+    case Gk:
+    case Bk:
+    case Mk:
+    case Dk:
+    case Wk:
+    case Xk:
       ReconstructSegment();
-      segmentKey = (byte)commandByte;
+      segmentKey = commandByte;
       break;
-    case (byte)EocK:
+    case EocK:
       ReconstructSegment();
-      segmentKey = (byte)commandByte;
+      segmentKey = commandByte;
       ProcessLiquidPixelCommand();
       break;
     default:
-      segmentBytesTemp[numberOfBytesInSegment] = commandByte;
+      segmentBytes[numberOfBytesInSegment] = commandByte;
       numberOfBytesInSegment++;
       break;
   }
@@ -112,42 +189,39 @@ void ProcessByte(byte commandByte)
 
 void ReconstructSegment()
 {
-  if (segmentKey != (byte)UnknownK && segmentKey != (byte)EocK)
+  if (segmentKey != UnknownK && segmentKey != EocK)
   {
-    byte segmentBytes[numberOfBytesInSegment];
-    memcpy(segmentBytes, segmentBytesTemp, numberOfBytesInSegment);
-    String segmentString = String((char *)segmentBytes);
-    int segmentValue = segmentString.toInt();
+    int segmentValue = atoi(segmentBytes);
 
     // populate Liquid Pixel Command
     switch (segmentKey)
     {
-      case (byte)Tk:
-        lpc.Type = segmentValue;
+      case Tk:
+        lpc.setType(segmentValue);
         break;
-      case (byte)Ck:
-        lpc.BoxId = segmentValue;
+      case Ck:
+        lpc.setBoxId(segmentValue);
         break;
-      case (byte)Rk:
-        lpc.R = segmentValue;
+      case Rk:
+        lpc.setR(segmentValue);
         break;
-      case (byte)Gk:
-        lpc.G = segmentValue;
+      case Gk:
+        lpc.setG(segmentValue);
         break;
-      case (byte)Bk:
-        lpc.B = segmentValue;
+      case Bk:
+        lpc.setB(segmentValue);
         break;
-      case (byte)Mk:
-        lpc.Mode = segmentValue;
+      case Mk:
+        lpc.setMode(segmentValue);
         break;
-      case (byte)Dk:
-        lpc.DelayMs = segmentValue;
+      case Dk:
+        lpc.setDelayMs(segmentValue);
         break;
-      case (byte)Wk:
-        lpc.DoWipe = (bool)segmentValue;
+      case Wk:
+        lpc.setDoWipe((bool)segmentValue);
         break;
-      case (byte)Xk:
-        lpc.IsRandom = (bool)segmentValue;
+      case Xk:
+        lpc.setIsRandom(segmentValue);
         break;
       default:
         break;
@@ -155,24 +229,24 @@ void ReconstructSegment()
 
     // reset number of bytes since we are done with this segment
     numberOfBytesInSegment = 0;
-    segmentBytesTemp[0] = 0;
-    segmentBytesTemp[1] = 0;
-    segmentBytesTemp[2] = 0;
+    segmentBytes[0] = 0;
+    segmentBytes[1] = 0;
+    segmentBytes[2] = 0;
   }
 }
 
 void ProcessLiquidPixelCommand()
 {
-  //  if(lpc.Type == Wdtr)
-  //  {
-  //    wdt_reset();
-  //    return;
-  //  }
+  if (lpc.Type() == Wdtr)
+  {
+    wdt_reset();
+    return;
+  }
 
-  if (lpc.DoWipe)
+  if (lpc.DoWipe())
     off();
 
-  switch (lpc.Mode)
+  switch (lpc.Mode())
   {
     case Sweep:
       leftEdgeStart = pixelLen - 1;
@@ -190,23 +264,23 @@ void ProcessLiquidPixelCommand()
       break;
   }
   String commandType = "Command type is: ";
-  Serial.println(commandType += lpc.Type);
+  Serial.println(commandType += lpc.Type());
   String BoxIdNumber = "BoxId number is: ";
-  Serial.println(BoxIdNumber += lpc.BoxId);
+  Serial.println(BoxIdNumber += lpc.BoxId());
   String redValue = "Red value is: ";
-  Serial.println(redValue += lpc.R);
+  Serial.println(redValue += lpc.R());
   String greenValue = "Green value is: ";
-  Serial.println(greenValue += lpc.G);
+  Serial.println(greenValue += lpc.G());
   String blueValue = "Blue value is: ";
-  Serial.println(blueValue += lpc.B);
+  Serial.println(blueValue += lpc.B());
   String mode = "Mode is: ";
-  Serial.println(mode += lpc.Mode);
+  Serial.println(mode += lpc.Mode());
   String DelayMs = "DelayMs is: ";
-  Serial.println(DelayMs += lpc.DelayMs);
+  Serial.println(DelayMs += lpc.DelayMs());
   String doWipe = "Wipe is: ";
-  Serial.println(doWipe += lpc.DoWipe);
+  Serial.println(doWipe += lpc.DoWipe());
   String isRandom = "Random is: ";
-  Serial.println(isRandom += lpc.IsRandom);
+  Serial.println(isRandom += lpc.IsRandom());
 }
 //*****************************************************************************
 
@@ -217,6 +291,7 @@ void off()
   }
   strip.show();
 }
+
 void solid(byte r, byte g, byte b) {
   for (int i = 0; i <= pixelLen; i++) {
     strip.setPixelColor(i, r, g, b);
@@ -413,37 +488,37 @@ void fadeout(byte r, byte g, byte b, byte delayMs) {
 
 void chooser()
 {
-  switch (lpc.Mode)
+  switch (lpc.Mode())
   {
     case Off:
       off();
       break;
     case Solid:
-      solid(lpc.R, lpc.G, lpc.B);
+      solid(lpc.R(), lpc.G(), lpc.B());
       break;
     case Flash:
-      flash(lpc.R, lpc.G, lpc.B, lpc.DelayMs);
+      flash(lpc.R(), lpc.G(), lpc.B(), lpc.DelayMs());
       break;
     case Sweep:
-      sweep(lpc.R, lpc.G, lpc.B, lpc.DelayMs);
+      sweep(lpc.R(), lpc.G(), lpc.B(), lpc.DelayMs());
       break;
     case Twinkle:
-      twinkle(lpc.R, lpc.G, lpc.B, lpc.DelayMs);
+      twinkle(lpc.R(), lpc.G(), lpc.B(), lpc.DelayMs());
       break;
     case RandomTwinkle:
-      randomtwinkle(lpc.DelayMs);
+      randomtwinkle(lpc.DelayMs());
       break;
     case Randomflash:
-      randomflash(lpc.DelayMs);
+      randomflash(lpc.DelayMs());
       break;
     case TheaterChase:
-      theaterChase(lpc.R, lpc.G, lpc.B, lpc.DelayMs);
+      theaterChase(lpc.R(), lpc.G(), lpc.B(), lpc.DelayMs());
       break;
     case FadeIn:
-      fadein(lpc.R, lpc.G, lpc.B, lpc.DelayMs);
+      fadein(lpc.R(), lpc.G(), lpc.B(), lpc.DelayMs());
       break;
     case FadeOut:
-      fadeout(lpc.R, lpc.G, lpc.B, lpc.DelayMs);
+      fadeout(lpc.R(), lpc.G(), lpc.B(), lpc.DelayMs());
       break;
     default:
       break;
@@ -454,7 +529,7 @@ void setup()
 {
   // immediately disable watchdog timer so set will not get interrupted
 
-  //wdt_disable();
+  wdt_disable();
 
   // I often do serial i/o at startup to allow the user to make config changes of
   // various constants. This is often using fgets which will wait for user input.
@@ -505,11 +580,12 @@ void loop()
 {
   if (Serial.available() > 0)
   {
-    byte byteFromSerialPort = Serial.read();
+    char byteFromSerialPort = Serial.read();
     ProcessByte(byteFromSerialPort);
   }
   else
   {
+    delay(10);
     chooser();
   }
 }
