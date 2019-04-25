@@ -452,4 +452,27 @@ void rgbFadeInAndOut(byte r, byte g, byte bui, byte delayMs)
     };
   }
 }
-
+//////////////////////////////          FALLING STARS
+void fallingstars(byte r, byte g, byte b, byte delayMs)
+{
+  int trailLen = 6;
+  if (!Serial.available())
+  {
+    for(int pos = 0; pos < (pixelLen + trailLen); pos++)
+    {
+      strip.setPixelColor(pos,r,g,b);
+      for(int i = 0; i < trailLen; i++)
+      {
+        int rf = round(r/i);
+        int gf = round(g/i);
+        int bf = round(b/i);
+        int curpos = pos - i;
+        strip.setPixelColor(curpos, rf , gf , bf );
+        delay(2);
+        strip.show();
+      };
+      delay(delayMs);
+      off();
+    };
+  }
+}

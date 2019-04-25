@@ -1,7 +1,7 @@
 #include <Adafruit_NeoPixel.h>
 #define PIN 6;
-int pixelLen = 1;
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(pixelLen, 6, NEO_GRB + NEO_KHZ800);
+int pixelLen = 49;
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(pixelLen, 6, NEO_RGB + NEO_KHZ800);
 int currentpixel = 0;
 int r = 255;
 int g = 255;
@@ -81,10 +81,11 @@ enum Mode : byte
   FadeOut,
   SuddenFlash,
   RandomBreath,
-  Breath
+  Breath,
+  FallingStars
 };
 
-typedef struct lpc
+struct lpc
 {
   byte Type;
   byte Box;
@@ -103,26 +104,16 @@ byte segmentBytesTemp[MAX_SEGMENT_LENGTH_IN_BYTES] = {0, 0, 0};
 lpc lpc;
 
 
-void diagnostics()
+void diagnostics(int info)
 {
-  if (lpc.Type == 99)
-  {
-    Serial.println("Disconnected");
-    IsConnected = false;
-  }
-  if (IsConnected)
+  if (info == 1 && Serial.available())
   {
     Serial.println(lpc.Mode);
-    delay(50);
   }
-  else
+  if (info == 99)
   {
-    Cycler++;
-    delay(10000);
-    if (Cycler > 14)
-    {
-      Cycler = 1;
-    }
+    Serial.println("Disconnecting");
+    IsConnected = false;
   }
 }
 void setup()
@@ -133,7 +124,7 @@ void setup()
   randomSeed(123);
   while (currentpixel <= pixelLen)
   {
-    strip.setPixelColor(currentpixel, 255, 57, 123);
+    strip.setPixelColor(currentpixel, 43, 219, 82); //codename wintergreen
     currentpixel++;
     strip.show();
     delay(50);
@@ -150,13 +141,18 @@ void loop()
     {
       byte byteFromSerialPort = Serial.read();
       ProcessByte(byteFromSerialPort);
-      flashdone = false;
+      flashdone = false;   
     }
     chooser(lpc.Mode, lpc.R, lpc.G, lpc.B, lpc.Delay);
-    diagnostics();
+    diagnostics(lpc.Type);
   }
   else
   {
-    chooser(Cycler, 255, 255, 255, 100);
+    chooser(Cycler/10000, 255, 255, 255, 100);
+    Cycler++;
+    if (Cycler > 14)
+    {
+      Cycler = 1;
+    }
   }
 }

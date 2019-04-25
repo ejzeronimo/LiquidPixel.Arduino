@@ -44,6 +44,8 @@ void chooser(byte moded, byte R, byte G, byte B, byte De)
     case Breath:
       rgbFadeInAndOut(R, G, B, De);
       break;
+    case FallingStars:
+      fallingstars(R, G, B, De);
     default:
       break;
   }
