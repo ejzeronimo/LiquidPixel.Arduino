@@ -1,7 +1,7 @@
 #include <Adafruit_NeoPixel.h>
 #define PIN 6;
-int pixelLen = 49;//25
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(pixelLen, 6, NEO_RGB + NEO_KHZ800);
+int pixelLen = 25;//25//30//49//42//30
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(pixelLen, 6, NEO_GRB + NEO_KHZ800);
 int currentpixel = 0;
 int r = 255;
 int g = 255;
@@ -69,12 +69,12 @@ enum Mode : byte
 {
   Off = 0,
   Solid,
-  RandomCloudy,
-  Flash,
-  Sweep,
+  RandomCloudy,//4
+  Flash,//8
+  Sweep, //3
   Twinkle,
-  RandomTwinkle,
-  RandomFlash,
+  RandomTwinkle,//5?
+  RandomFlash, //1 //7
   TheaterChase,
   Chroma,
   FadeIn,
@@ -82,9 +82,11 @@ enum Mode : byte
   SuddenFlash,
   RandomBreath,
   Breath,
-  FallingStars,
-  ChristamsChase,
-  Pong
+  FallingStars, //2 //6
+  ChristmasChase,
+  Pong,
+  Waterfall
+  //3 male, 1 female
 };
 
 struct lpc

@@ -89,19 +89,22 @@ void randomcloudyblobs(int red, int green, int blue, int delayy)
 }
 //////////////////////////////          FLASH
 void flash(byte r, byte g, byte b, int delayMs) {
-  for (int i = pixelLen; i >= 0; i--) {
-    strip.setPixelColor(i, r, g, b);
-  };
-  strip.show();
-  delay(delayMs);
-  for (int i = pixelLen; i >= 0; i--) {
-    strip.setPixelColor(i, 0, 0, 0);
-  };
-  strip.show();
-  delay(delayMs);
+  if (!Serial.available())
+  {
+    for (int i = pixelLen; i >= 0; i--) {
+      strip.setPixelColor(i, r, g, b);
+    };
+    strip.show();
+    delay(delayMs);
+    for (int i = pixelLen; i >= 0; i--) {
+      strip.setPixelColor(i, 0, 0, 0);
+    };
+    strip.show();
+    delay(delayMs);
+  }
 }
 //////////////////////////////          SWEEP
-void sweep(byte r, byte g, byte b, byte delayMs) {
+void sweep(byte r, byte g, byte b, int delayMs) {
   if (!isWalking && isWalkingDone)
   {
     // top on
@@ -288,6 +291,7 @@ void randomtwinklerainbow(int delayy)
     strip.setPixelColor(curro, 0, 0, 0);
     strip.show();
     delay(delayy);
+
   }
   else
   {
@@ -296,22 +300,25 @@ void randomtwinklerainbow(int delayy)
 }
 //////////////////////////////          RANDOM FLASH
 void randomflash(int delayMs) {
-  byte r = random(255);
-  byte g = random(255);
-  byte b = random(255);
-  for (int i = pixelLen; i >= 0; i--) {
-    strip.setPixelColor(i, r, g, b);
-  };
-  strip.show();
-  delay(delayMs);
-  for (int i = pixelLen; i >= 0; i--) {
-    strip.setPixelColor(i, 0, 0, 0);
-  };
-  strip.show();
-  delay(delayMs);
+  if (!Serial.available())
+  {
+    byte r = random(255);
+    byte g = random(255);
+    byte b = random(255);
+    for (int i = pixelLen; i >= 0; i--) {
+      strip.setPixelColor(i, r, g, b);
+    };
+    strip.show();
+    delay(delayMs);
+    for (int i = pixelLen; i >= 0; i--) {
+      strip.setPixelColor(i, 0, 0, 0);
+    };
+    strip.show();
+    delay(delayMs);
+  }
 }
 //////////////////////////////          THEATER CHASE
-void theaterChase(byte r, byte g, byte b, byte delayMs)
+void theaterChase(byte r, byte g, byte b, int delayMs)
 {
   if (!Serial.available())
   {
@@ -332,7 +339,7 @@ void theaterChase(byte r, byte g, byte b, byte delayMs)
   }
 }
 //////////////////////////////          CHROMA
-void chroma(byte Delay)
+void chroma(int Delay)
 {
   if (!Serial.available())
   {
@@ -352,51 +359,69 @@ void chroma(byte Delay)
 }
 
 //////////////////////////////          FADE IN
-void fadein(byte r, byte g, byte b, byte delayMs)
+void fadein(byte r, byte g, byte b, int delayMs)
 {
-  if (brightness < 255)
+  if (!Serial.available())
   {
-
-    for (int i = 0; i < 58; i++)
+    if (flashdone)
     {
-      strip.setPixelColor(i, r, g, b);
-    };
-
-    strip.setBrightness(brightness);
-    strip.show();
-
-    ++brightness;
-    delay(delayMs);
+      go = true;
+    }
+    if (go && !flashdone)
+    {
+      for (int brightness = 0; brightness < 255; brightness++)
+      {
+        for (int i = 0; i < pixelLen; i++)
+        {
+          strip.setPixelColor(i, r, g, b);
+        };
+        strip.setBrightness(brightness);
+        strip.show();
+        delay(delayMs);
+      }
+      go = false;
+      flashdone = true;
+    }
+    strip.setBrightness(255);
+    go = false;
+    flashdone = true;
   }
 }
 //////////////////////////////          FADE OUT
-void fadeout(byte r, byte g, byte b, byte delayMs) {
-  if (brightness >= 0)
+void fadeout(byte r, byte g, byte b, int delayMs)
+{
+  if (!Serial.available())
   {
-
-    for (int i = 0; i < pixelLen; i++) {
-      strip.setPixelColor(i, r, g, b);
-    };
-
-    strip.setBrightness(brightness);
-    strip.show();
-
-    --brightness;
-    delay(delayMs);
-  }
-  if (brightness <= 0)
-  {
-    for ( currentpixel = 0; currentpixel <= pixelLen; currentpixel++)
+    if (flashdone)
     {
-      strip.setPixelColor(currentpixel, 0, 0, 0);
+      go = true;
     }
-    strip.show();
-    currentpixel = 0;
+    if (go && !flashdone)
+    {
+      for (int brightness = 255; brightness > 0; brightness--)
+      {
+        for (int i = 0; i < pixelLen; i++)
+        {
+          strip.setPixelColor(i, r, g, b);
+        };
+        strip.setBrightness(brightness);
+        strip.show();
+        delay(delayMs);
+      }
+      go = false;
+      flashdone = true;
+    }
+    for (int i = 0; i < pixelLen; i++)
+    {
+      strip.setPixelColor(i, 0, 0, 0);
+    };
+    strip.setBrightness(255);
+    go = false;
+    flashdone = true;
   }
-  strip.setBrightness(255);
 }
 //////////////////////////////          SUDDEN FLASH
-void sudden(byte r, byte g, byte b, byte delayMs)
+void sudden(byte r, byte g, byte b, int delayMs)
 {
   if (go && !flashdone)
   {
@@ -424,7 +449,7 @@ void sudden(byte r, byte g, byte b, byte delayMs)
 
 }
 //////////////////////////////          RANDOM BREATH
-void randomfadeinandout(byte delayMs)
+void randomfadeinandout(int delayMs)
 {
   if (!Serial.available())
   {
@@ -449,9 +474,9 @@ void randomfadeinandout(byte delayMs)
   }
 }
 //////////////////////////////          BREATH
-void rgbFadeInAndOut(byte r, byte g, byte bui, byte delayMs)
+void rgbFadeInAndOut(byte r, byte g, byte bui, int delayMs)
 {
-  if (Serial.available())
+  if (!Serial.available())
   {
     for (int b = 0; b < 255; b++) {
       for (int i = 0; i < pixelLen; i++) {
@@ -471,9 +496,9 @@ void rgbFadeInAndOut(byte r, byte g, byte bui, byte delayMs)
   }
 }
 //////////////////////////////          FALLING STARS
-void fallingstars(byte r, byte g, byte b, byte delayMs)
+void fallingstars(byte r, byte g, byte b, int delayMs)
 {
-  int trailLen = 6;
+  int trailLen = 10;//round(pixelLen/delayMs);
   if (!Serial.available())
   {
     for (int pos = 0; pos < (pixelLen + trailLen); pos++)
@@ -481,21 +506,21 @@ void fallingstars(byte r, byte g, byte b, byte delayMs)
       strip.setPixelColor(pos, r, g, b);
       for (int i = 0; i < trailLen; i++)
       {
-        int rf = round(r / i);
-        int gf = round(g / i);
-        int bf = round(b / i);
+        int rf = round(r / (i * i));
+        int gf = round(g / (i * i));
+        int bf = round(b / (i * i));
         int curpos = pos - i;
         strip.setPixelColor(curpos, rf , gf , bf );
         delay(2);
         strip.show();
       };
       delay(delayMs);
-      off();
+      strip.setPixelColor(pos - trailLen, 0, 0, 0);
     };
   }
 }
 //////////////////////////////          CHRISTMAS CHASE
-void xmaschase(byte delayMs)
+void xmaschase(int delayMs)
 {
   if (!Serial.available())
   {
@@ -516,7 +541,7 @@ void xmaschase(byte delayMs)
   }
 }
 //////////////////////////////          PONG
-void pong(byte r, byte g, byte b, byte delayMs)
+void pong(byte r, byte g, byte b, int delayMs)
 {
   int trailLen = 6;
   if (!Serial.available())
@@ -535,7 +560,7 @@ void pong(byte r, byte g, byte b, byte delayMs)
         strip.show();
       };
       delay(delayMs);
-      off();
+      strip.setPixelColor(pos - trailLen, 0, 0, 0);
     };
     for (int pos = pixelLen; pos > 0; pos--)
     {
@@ -551,7 +576,23 @@ void pong(byte r, byte g, byte b, byte delayMs)
         strip.show();
       };
       delay(delayMs);
-      off();
+      strip.setPixelColor(pos + trailLen, 0, 0, 0);
     };
+  }
+}
+//////////////////////////////          WATERFALL
+void waterfall(byte r, byte g, byte b, int delayMs)
+{
+  int i;
+  if (!Serial.available())
+  {
+    while (currentpixel <= pixelLen)
+    {
+      strip.setPixelColor(currentpixel, r, g, b); //codename wintergreen
+      currentpixel++;
+      strip.show();
+      delay(delayMs);
+    }
+    currentpixel = 0;
   }
 }
