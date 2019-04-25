@@ -29,6 +29,9 @@ void chooser(byte moded, byte R, byte G, byte B, byte De)
     case RandomFlash:
       randomflash(De);
       break;
+    case Chroma:
+      chroma(De);
+      break;
     case FadeIn:
       fadein(R, G, B, De);
       break;
@@ -46,6 +49,12 @@ void chooser(byte moded, byte R, byte G, byte B, byte De)
       break;
     case FallingStars:
       fallingstars(R, G, B, De);
+    case ChristamsChase:
+      xmaschase(De);
+      break;
+    case Pong:
+      pong(R, G, B, De);
+      break;
     default:
       break;
   }

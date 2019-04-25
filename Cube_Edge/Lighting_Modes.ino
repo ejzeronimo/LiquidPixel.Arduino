@@ -331,15 +331,34 @@ void theaterChase(byte r, byte g, byte b, byte delayMs)
     }
   }
 }
-
 //////////////////////////////          CHROMA
+void chroma(byte Delay)
+{
+  if (!Serial.available())
+  {
+    byte r;
+    byte g;
+    byte b;
+    for (int i = pixelLen; i >= 0; i--)
+    {
+      r = random(255);
+      b = random(255);
+      g = random(255);
+      strip.setPixelColor(i, r, g, b);
+    };
+    strip.show();
+    delay(Delay);
+  }
+}
 
 //////////////////////////////          FADE IN
 void fadein(byte r, byte g, byte b, byte delayMs)
 {
-  if (brightness <= 255) {
+  if (brightness < 255)
+  {
 
-    for (int i = 0; i < 58; i++) {
+    for (int i = 0; i < 58; i++)
+    {
       strip.setPixelColor(i, r, g, b);
     };
 
@@ -373,9 +392,8 @@ void fadeout(byte r, byte g, byte b, byte delayMs) {
     }
     strip.show();
     currentpixel = 0;
-    strip.setBrightness(255);
   }
-
+  strip.setBrightness(255);
 }
 //////////////////////////////          SUDDEN FLASH
 void sudden(byte r, byte g, byte b, byte delayMs)
@@ -458,15 +476,76 @@ void fallingstars(byte r, byte g, byte b, byte delayMs)
   int trailLen = 6;
   if (!Serial.available())
   {
-    for(int pos = 0; pos < (pixelLen + trailLen); pos++)
+    for (int pos = 0; pos < (pixelLen + trailLen); pos++)
     {
-      strip.setPixelColor(pos,r,g,b);
-      for(int i = 0; i < trailLen; i++)
+      strip.setPixelColor(pos, r, g, b);
+      for (int i = 0; i < trailLen; i++)
       {
-        int rf = round(r/i);
-        int gf = round(g/i);
-        int bf = round(b/i);
+        int rf = round(r / i);
+        int gf = round(g / i);
+        int bf = round(b / i);
         int curpos = pos - i;
+        strip.setPixelColor(curpos, rf , gf , bf );
+        delay(2);
+        strip.show();
+      };
+      delay(delayMs);
+      off();
+    };
+  }
+}
+//////////////////////////////          CHRISTMAS CHASE
+void xmaschase(byte delayMs)
+{
+  if (!Serial.available())
+  {
+    for (int j = 0; j < 10; j++) { //do 10 cycles of chasing
+      for (int q = 0; q < 3; q++) {
+        for (int i = 0; i < pixelLen; i = i + 3) {
+          strip.setPixelColor(i + q, 255, 0, 0);  //turn every third pixel on
+        }
+        strip.show();
+
+        delay(delayMs);
+
+        for (int i = 0; i < pixelLen; i = i + 3) {
+          strip.setPixelColor(i + q, 0, 255, 0);    //turn every third pixel off
+        }
+      }
+    }
+  }
+}
+//////////////////////////////          PONG
+void pong(byte r, byte g, byte b, byte delayMs)
+{
+  int trailLen = 6;
+  if (!Serial.available())
+  {
+    for (int pos = 0; pos < (pixelLen); pos++)
+    {
+      strip.setPixelColor(pos, r, g, b);
+      for (int i = 0; i < trailLen; i++)
+      {
+        int rf = round(r / i);
+        int gf = round(g / i);
+        int bf = round(b / i);
+        int curpos = pos - i;
+        strip.setPixelColor(curpos, rf , gf , bf );
+        delay(2);
+        strip.show();
+      };
+      delay(delayMs);
+      off();
+    };
+    for (int pos = pixelLen; pos > 0; pos--)
+    {
+      strip.setPixelColor(pos, r, g, b);
+      for (int i = 0; i < trailLen; i++)
+      {
+        int rf = round(r / i);
+        int gf = round(g / i);
+        int bf = round(b / i);
+        int curpos = pos + i;
         strip.setPixelColor(curpos, rf , gf , bf );
         delay(2);
         strip.show();
