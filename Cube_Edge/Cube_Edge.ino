@@ -1,8 +1,9 @@
 #include <Adafruit_NeoPixel.h>
 #define PIN 6;
-int pixelLen = 25;//25//30//49//42//30
+int pixelLen = 26;//25//49//42//30
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(pixelLen, 6, NEO_GRB + NEO_KHZ800);
 int currentpixel = 0;
+int chainpos = 5;
 int r = 255;
 int g = 255;
 int b = 255;
@@ -134,6 +135,7 @@ void setup()
     delay(50);
   }
   currentpixel = 0;
+  off();
   Serial.println("Box_Online");
 }
 
@@ -144,11 +146,15 @@ void loop()
     if (Serial.available())
     {
       byte byteFromSerialPort = Serial.read();
+      Serial.write(byteFromSerialPort);
       ProcessByte(byteFromSerialPort);
       flashdone = false;   
     }
+    if(lpc.Box == chainpos || lpc.Box == 0)
+    {
     chooser(lpc.Mode, lpc.R, lpc.G, lpc.B, lpc.Delay);
     diagnostics(lpc.Type);
+    }
   }
   else
   {
