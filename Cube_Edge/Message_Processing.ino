@@ -1,4 +1,4 @@
-//T0C5R247G42B71M0D50X0~T0C3R177G201B99M1D100X1~T0C1R77G20B9M1D25X0~
+//T0C0R247G42B71M0D50X0~T0C0R177G201B99M1D100X1~T0C0R77G20B9M19D25X0~T0C0R77G20B9M21D50X0~
 
 void ProcessByte(byte commandByte)
 {
@@ -35,6 +35,10 @@ void ProcessByte(byte commandByte)
     case (byte)Xd:
       ReconstructSegment();
       reconstructionMode = (byte)Xm;
+      break;
+    case (byte)Sd:
+      ReconstructSegment();
+      reconstructionMode = (byte)Sm;
       break;
     case (byte)EocD:
       ReconstructSegment();
@@ -83,6 +87,9 @@ void ReconstructSegment()
         break;
       case (byte)Xm:
         lpc.IsRandom = (bool)segmentAsInt;
+        break;
+     case (byte)Sm:
+        lpc.Sound = (byte)segmentAsInt;
         break;
       default:
         break;

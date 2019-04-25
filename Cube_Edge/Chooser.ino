@@ -1,4 +1,4 @@
-void chooser(byte moded, byte R, byte G, byte B, byte De)
+void chooser(byte moded, byte R, byte G, byte B, byte De, byte S)
 {
   switch (moded)
   {
@@ -56,8 +56,26 @@ void chooser(byte moded, byte R, byte G, byte B, byte De)
     case Pong:
       pong(R, G, B, De);
       break;
-     case Waterfall:
+    case Waterfall:
       waterfall(R, G, B, De);
+      break;
+    case Lightning:
+      lightning(R, G, B, De);
+      break;
+    case Waves:
+      waves(R, G, B, De);
+      break;
+    case Levels:
+      levels(R, G, B, De);
+      break;
+    case Rain:
+      rain(R, G, B, De);
+      break;
+    case Pause:
+    //empty bc that how it actually pauses
+      break;
+   case SoundSync:
+      soundsync(R, G, B, S);
       break;
     default:
       break;

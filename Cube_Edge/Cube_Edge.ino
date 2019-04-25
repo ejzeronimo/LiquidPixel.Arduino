@@ -1,9 +1,9 @@
 #include <Adafruit_NeoPixel.h>
 #define PIN 6;
-int pixelLen = 26;//25//49//42//30
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(pixelLen, 6, NEO_GRB + NEO_KHZ800);
+int pixelLen = 60;//25//49//42//30 //25 for Headbox 30 for Clockbox
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(pixelLen, 6, NEO_RGB + NEO_KHZ800); //RGB for cables, GRB for strips
 int currentpixel = 0;
-int chainpos = 5;
+int chainpos = 0;
 int r = 255;
 int g = 255;
 int b = 255;
@@ -41,6 +41,7 @@ enum CommandDelimeters : byte
   Md = (byte)'M',
   Dd = (byte)'D',
   Xd = (byte)'X',
+  Sd = (byte)'S',
   EocD = (byte)'~'
 };
 
@@ -55,6 +56,7 @@ enum ReconstructionMode : byte
   Mm,
   Dm,
   Xm,
+  Sm,
   EocM
 };
 
@@ -86,7 +88,13 @@ enum Mode : byte
   FallingStars, //2 //6
   ChristmasChase,
   Pong,
-  Waterfall
+  Waterfall,
+  Lightning,
+  Waves,
+  Levels,
+  Rain,
+  Pause,
+  SoundSync
   //3 male, 1 female
 };
 
@@ -100,6 +108,7 @@ struct lpc
   byte Mode;
   byte Delay;
   bool IsRandom;
+  byte Sound;
 };
 
 const byte MAX_SEGMENT_LENGTH_IN_BYTES = 3;
@@ -148,17 +157,18 @@ void loop()
       byte byteFromSerialPort = Serial.read();
       Serial.write(byteFromSerialPort);
       ProcessByte(byteFromSerialPort);
-      flashdone = false;   
+      flashdone = false;
+      currentpixel = 0;
     }
-    if(lpc.Box == chainpos || lpc.Box == 0)
+    if (lpc.Box == chainpos || lpc.Box == 0)
     {
-    chooser(lpc.Mode, lpc.R, lpc.G, lpc.B, lpc.Delay);
-    diagnostics(lpc.Type);
+      chooser(lpc.Mode, lpc.R, lpc.G, lpc.B, lpc.Delay, lpc.Sound);
+      diagnostics(lpc.Type);
     }
   }
   else
   {
-    chooser(Cycler/10000, 255, 255, 255, 100);
+    chooser(Cycler / 10000, 255, 255, 255, 100, 0);
     Cycler++;
     if (Cycler > 14)
     {

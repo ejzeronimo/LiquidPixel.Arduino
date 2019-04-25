@@ -423,30 +423,32 @@ void fadeout(byte r, byte g, byte b, int delayMs)
 //////////////////////////////          SUDDEN FLASH
 void sudden(byte r, byte g, byte b, int delayMs)
 {
-  if (go && !flashdone)
+  if (!Serial.available())
   {
-    for ( currentpixel = 0; currentpixel <= pixelLen; currentpixel++)
+    if (go && !flashdone)
     {
-      strip.setPixelColor(currentpixel, r, g, b);
+      for ( currentpixel = 0; currentpixel <= pixelLen; currentpixel++)
+      {
+        strip.setPixelColor(currentpixel, r, g, b);
+      }
+      strip.show();
+      currentpixel = 0;
+      strip.show();
+      delay(delayMs);
+      for ( currentpixel = 0; currentpixel <= pixelLen; currentpixel++)
+      {
+        strip.setPixelColor(currentpixel, 0, 0, 0);
+      }
+      strip.show();
+      currentpixel = 0;
+      go = false;
+      flashdone = true;
     }
-    strip.show();
-    currentpixel = 0;
-    strip.show();
-    delay(delayMs);
-    for ( currentpixel = 0; currentpixel <= pixelLen; currentpixel++)
+    if (flashdone)
     {
-      strip.setPixelColor(currentpixel, 0, 0, 0);
+      go = true;
     }
-    strip.show();
-    currentpixel = 0;
-    go = false;
-    flashdone = true;
   }
-  if (flashdone)
-  {
-    go = true;
-  }
-
 }
 //////////////////////////////          RANDOM BREATH
 void randomfadeinandout(int delayMs)
@@ -588,11 +590,156 @@ void waterfall(byte r, byte g, byte b, int delayMs)
   {
     while (currentpixel <= pixelLen)
     {
-      strip.setPixelColor(currentpixel, r, g, b); //codename wintergreen
+      strip.setPixelColor(currentpixel, r, g, b);
       currentpixel++;
       strip.show();
       delay(delayMs);
     }
     currentpixel = 0;
   }
+}
+//////////////////////////////          LIGHTNING
+void lightning(byte r, byte g, byte b, int delayMs)
+{
+  //turn on
+  //turn off
+  //turn on for real
+  //off
+  if (!Serial.available())
+  {
+    if (go && !flashdone)
+    {
+      solid(r, g, b);
+      delay(round(delayMs / 6)); // how long on
+      off();
+      delay(round(delayMs / 4)); // how long off
+      solid(r, g, b);
+      delay(round(delayMs / 2)); // how long on
+      off();
+      go = false;
+      flashdone = true;
+    }
+    if (flashdone)
+    {
+      go = true;
+    }
+  }
+}
+//////////////////////////////          WAVES
+void waves(byte r, byte g, byte b, int delayMs)
+{
+  int trailLen = 10;//round(pixelLen/delayMs);
+  int swellLen = 2;
+  if (!Serial.available())
+  {
+    for (int pos = 0; pos < (pixelLen + trailLen); pos++)
+    {
+      for (int i = 1; i < swellLen; i++)
+      {
+        int rs = round(r / ((i * i)));
+        int gs = round(g / ((i * i)));
+        int bs = round(b / ((i * i)));
+        int prepos = pos + i;
+        strip.setPixelColor(prepos, rs , gs , bs );
+        delay(2);
+        strip.show();
+      };
+
+      strip.setPixelColor(pos, r, g, b);
+
+      for (int i = 1; i < trailLen; i++)
+      {
+        int rf = round(r / ((i * i) / 4));
+        int gf = round(g / ((i * i) / 4));
+        int bf = round(b / ((i * i) / 4));
+        int curpos = pos - i;
+        strip.setPixelColor(curpos, rf , gf , bf );
+        delay(2);
+        strip.show();
+      };
+      delay(delayMs);
+      strip.setPixelColor(pos - (4 * trailLen), 0, 0, 0);
+    };
+  }
+}
+//////////////////////////////          LEVELS
+void levels(byte r, byte g, byte b, int delayMs)
+{
+  int trailLen = pixelLen;
+  int maxheight = round(pixelLen / random(1, 5));
+  if (!Serial.available())
+  {
+
+    for (int pos = -1; pos <= maxheight; pos++)
+    {
+      strip.setPixelColor(pos, r, g, b);
+      for (int i = 0; i < trailLen; i++)
+      {
+        int rf = round(r / i);
+        int gf = round(g / i);
+        int bf = round(b / i);
+        int curpos = pos + i;
+        strip.setPixelColor(curpos, rf , gf , bf );
+        delay(2);
+        strip.show();
+      };
+      delay(delayMs);
+    };
+    for (int pos = maxheight; pos >= 0; pos--)
+    {
+      strip.setPixelColor(pos, r, g, b);
+      for (int i = 0; i < trailLen; i++)
+      {
+        int rf = round(r / i);
+        int gf = round(g / i);
+        int bf = round(b / i);
+        int curpos = pos + i;
+        strip.setPixelColor(curpos, rf , gf , bf );
+        delay(2);
+        strip.show();
+      };
+      delay(delayMs);
+    };
+  }
+}
+//////////////////////////////          RAIN
+void rain(byte r, byte g, byte b, int delayMs)
+{
+  int trailLen = 1;//round(pixelLen/delayMs);
+  int offset = 4 + trailLen;
+  int k;
+  if (!Serial.available())
+  {
+    for (int q = 0; q < offset; q++)
+    {
+      for (int i = 0; i < (pixelLen + trailLen + 1); i = i + offset)
+      {
+        strip.setPixelColor(i + q, r, g, b);  //turn every third pixel on
+        for (int w = 0; w < trailLen; w++)
+        {
+          k = w + 1;
+          int rf = round(r / (k * k));
+          int gf = round(g / (k * k));
+          int bf = round(b / (k * k));
+          int curpos = i + q - k;
+          strip.setPixelColor(curpos, rf , gf , bf );
+          strip.setPixelColor(i + q - (trailLen + 1), 0, 0, 0);
+          delay(2);
+        };
+      }
+      strip.show();
+      delay(delayMs);
+    }
+  }
+}
+//////////////////////////////          SOUNDSYNC
+void soundsync(byte r, byte g, byte b, byte sound)
+{
+  strip.setBrightness(sound);
+  strip.show();
+//  for ( int i = 0; i <= pixelLen; i++)
+//  {
+//    strip.setPixelColor(i, r, g, b);
+//    strip.show();
+//  }
 }
