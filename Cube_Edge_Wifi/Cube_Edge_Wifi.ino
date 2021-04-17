@@ -1,18 +1,23 @@
 #include <FastLED.h>
 #include <WiFi.h>
+
 #define PIN 13
 #define pixelLen 25//MUST BE SET BEFORE DOWNLOAD
 #define id 0//MUST BE SET BEFORE DOWNLOAD
-#define MAX_SEGMENT_LENGTH_IN_BYTES 37
-#define MAX_PAYLOAD_LENGTH 9
 const char* ssid = "ssid";
 const char* password = "password";
-CRGB strip[pixelLen];
-bool oneTimePerCommand = true;
+const char* ip = "serverip";
+#define port 742
+#define MAX_SEGMENT_LENGTH_IN_BYTES 37
+#define MAX_PAYLOAD_LENGTH 9
+
 byte numberOfBytesInSegment = 0;
 byte reconstructionMode = 0;
 int lastPayloadDelimit = -1;
 byte segmentBytesTemp[MAX_SEGMENT_LENGTH_IN_BYTES];
+CRGB strip[pixelLen];
+bool oneTimePerCommand = true;
+WiFiClient client;
 
 struct LPC {
   byte Target;
@@ -57,7 +62,7 @@ boolean smartDelay(int ms) {
   long startMs = millis(); //get the time
   while (millis() < (startMs + ms)) {
     yield(); //do nothing?
-    if (Serial.available()) {
+    if (client.available()) {
       return false; //back out to get new command
     }
   }
@@ -81,6 +86,11 @@ void setup() {
   Serial.print("Connected. My IP address is: ");
   Serial.println(WiFi.localIP());
 
+  if (client.connect(ip, port)) {
+    Serial.print("connected to LPC Server: ");
+    Serial.println(ip);
+  }
+
   FastLED.addLeds<NEOPIXEL, PIN>(strip, pixelLen).setCorrection(TypicalLEDStrip);
 
   waterfallRainbow(50);
@@ -89,9 +99,10 @@ void setup() {
   Serial.println("Box_#" + (String)id + "_Online");
 }
 
+
 void loop() {
-  if (Serial.available()) {
-    byte byteFromSerialPort = Serial.read();
+  if (client.available()) {
+    byte byteFromSerialPort = client.read();
     ProcessByte(byteFromSerialPort);
   }
   else if ((lpcCommand.Target == id || lpcCommand.Target == 0)) {

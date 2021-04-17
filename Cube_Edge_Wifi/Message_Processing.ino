@@ -96,20 +96,20 @@ void ReconstructSegment() {
 }
 
 void Processlpc() {
-//  String boxNumber = "Target number is: ";
-//  Serial.println(boxNumber += lpcTemp.Target);
-//  String commandType = "Command type is: ";
-//  Serial.println(commandType += lpcTemp.Type);
-//
-//  for (int i = 0; i < 6; i++) {
-//    String redValue = "Payload value is: ";
-//    Serial.println(redValue += lpcTemp.Payload[i]);
-//  }
-//
-//  String mode = "Mode is: ";
-//  Serial.println(mode += lpcTemp.Mode);
-//  String delayMs = "Delay is: ";
-//  Serial.println(delayMs += lpcTemp.Delay);
+//    String boxNumber = "Target number is: ";
+//    Serial.println(boxNumber += lpcTemp.Target);
+//    String commandType = "Command type is: ";
+//    Serial.println(commandType += lpcTemp.Type);
+//  
+//    for (int i = 0; i < 6; i++) {
+//      String redValue = "Payload value is: ";
+//      Serial.println(redValue += lpcTemp.Payload[i]);
+//    }
+//  
+//    String mode = "Mode is: ";
+//    Serial.println(mode += lpcTemp.Mode);
+//    String delayMs = "Delay is: ";
+//    Serial.println(delayMs += lpcTemp.Delay);
 
   //make the temp into the main command and reset ont time vars
   lpcCommand.Target = lpcTemp.Target;
@@ -120,7 +120,3 @@ void Processlpc() {
 
   oneTimePerCommand = true;
 }
-
-
-
-

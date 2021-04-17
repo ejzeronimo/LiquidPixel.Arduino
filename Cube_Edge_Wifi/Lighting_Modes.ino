@@ -286,11 +286,11 @@ void lightning(byte r, byte g, byte b, int delayMs) {
   if (oneTimePerCommand) {
     solid(r, g, b);
     smartDelay(round(delayMs / 6)); // how long on
-    solid(0,0,0);
+    solid(0, 0, 0);
     smartDelay(round(delayMs / 4)); // how long off
     solid(r, g, b);
     smartDelay(round(delayMs / 2)); // how long on
-    solid(0,0,0);
+    solid(0, 0, 0);
     oneTimePerCommand = false;
   }
 }
