@@ -1,6 +1,6 @@
 #include <FastLED.h>
 #define PIN 13
-#define pixelLen 25//MUST BE SET BEFORE DOWNLOAD
+#define pixelLen 1//MUST BE SET BEFORE DOWNLOAD
 #define id 0//MUST BE SET BEFORE DOWNLOAD
 #define MAX_SEGMENT_LENGTH_IN_BYTES 37
 #define MAX_PAYLOAD_LENGTH 9
@@ -67,17 +67,19 @@ void setup() {
   FastLED.addLeds<NEOPIXEL, PIN>(strip, pixelLen).setCorrection(TypicalLEDStrip);
 
   waterfallRainbow(50);
-  solid(0,0,0);
+  solid(0, 0, 0);
 
   Serial.println("Box_#" + (String)id + "_Online");
 }
 
 void loop() {
-  if (Serial.available()) {
-    byte byteFromSerialPort = Serial.read();
-    ProcessByte(byteFromSerialPort);
-  }
-  else if ((lpcCommand.Target == id || lpcCommand.Target == 0)) {
-    chooser(lpcCommand.Mode, lpcCommand.Payload[0], lpcCommand.Payload[1], lpcCommand.Payload[2], lpcCommand.Delay);
-  }
+//  solid(0, 255, 255);
+    chroma(75);
+  //  if (Serial.available()) {
+  //    byte byteFromSerialPort = Serial.read();
+  //    ProcessByte(byteFromSerialPort);
+  //  }
+  //  else if ((lpcCommand.Target == id || lpcCommand.Target == 0)) {
+  //    chooser(lpcCommand.Mode, lpcCommand.Payload[0], lpcCommand.Payload[1], lpcCommand.Payload[2], lpcCommand.Delay);
+  //  }
 }
