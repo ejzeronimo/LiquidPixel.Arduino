@@ -25,7 +25,7 @@ websockets::WebsocketsClient *client = new websockets::WebsocketsClient();
 void setup()
 {
   //this wraps out config, run here not in thread beacuse it might be needed
-  LpxConfig.initConfig();
+  LpxConfig.initConfig(); 
 
   binsem = xSemaphoreCreateBinary();
   testSemCommand.strand_index = 0;
