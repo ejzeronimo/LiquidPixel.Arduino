@@ -6,8 +6,8 @@ CLpxConfig LpxConfig;
 const char *CLpxConfig::LPX_VERSION = "01.01.2022";
 const char *CLpxConfig::LPX_ID = "E0001";
 
-const char *CLpxConfig::SSID_NAME = "Noah";
-const char *CLpxConfig::SSID_PASSPHRASE = "Abr@h@mFGsltw!3161463";
+const char *CLpxConfig::SSID_NAME = "ssid";
+const char *CLpxConfig::SSID_PASSPHRASE = "password";
 
 const char *CLpxConfig::TARGET_IP = "172.16.17.57";
 const int CLpxConfig::TARGET_PORT = 742;
