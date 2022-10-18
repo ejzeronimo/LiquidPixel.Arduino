@@ -1,1 +1,1 @@
-This is a depreciated version of the LPX edge code - saved here for job reference, please do not copy.
+An archive all old versions of the Liquid Pixel edge code
